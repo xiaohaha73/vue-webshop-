@@ -2,18 +2,33 @@ import Vue from 'vue'
 import VueRouter from 'vue-router'
 import login from '../components/login.vue'
 import home from '../components/home.vue'
+import welcome from '../components/welcome.vue'
+import users from '../components/user/users.vue'
 
 Vue.use(VueRouter)
 
 const routes = [
   { path: '/', redirect: '/login' }, // 访问首页时重定向到登录页面
   { path: '/login', component: login },
-  { path: '/home', component: home } // home页面的路由
+  {
+    path: '/home',
+    redirect: '/welcome', // 设置home页面的默认显示界面
+    component: home,
+    children: [
+      { path: '/welcome', component: welcome },
+      { path: '/users', component: users }
+    ]
+  } // home页面的路由
 ]
 
 const router = new VueRouter({
   routes
 })
+
+const originalPush = VueRouter.prototype.push
+VueRouter.prototype.push = function push (location) {
+  return originalPush.call(this, location).catch(err => err)
+}
 
 // 路由导航守卫
 router.beforeEach((to, from, next) => {
