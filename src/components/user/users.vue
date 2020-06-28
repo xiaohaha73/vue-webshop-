@@ -37,7 +37,7 @@
             <el-button type="primary" icon="el-icon-edit" size="mini" @click="editDataHandler(scope.row.id)"></el-button>
             <el-button type="danger" icon="el-icon-delete" size="mini" @click="deleteHandler(scope.row.id)"></el-button>
             <el-tooltip effect="dark" content="更改角色" placement="top" :enterable="false">
-              <el-button type="warning" icon="el-icon-setting" size="mini"></el-button>
+              <el-button type="warning" icon="el-icon-setting" size="mini" @click="roleDialogHandler(scope.row)"></el-button>
             </el-tooltip>
           </template>
         </el-table-column>
@@ -79,6 +79,7 @@
 
     <!-- 修改用户信息弹窗   -->
     <el-dialog title="编辑用户" :visible.sync="edit_dialogVisible" width="40%" @close="editFormClose">
+
       <!--      表单主体区域-->
       <el-form ref="edit_form"  label-width="80px" :model="edit_form" :rules="editFormRules">
         <el-form-item label="用户名" prop="username">
@@ -95,6 +96,26 @@
       <span slot="footer" class="dialog-footer">
         <el-button @click="edit_dialogVisible = false">取 消</el-button>
         <el-button type="primary" @click="editFormSubmit">更改</el-button>
+      </span>
+    </el-dialog>
+
+    <!-- 更改角色弹窗   -->
+    <el-dialog title="更改角色" :visible.sync="role_dialogVisible" width="30%" @close="roleDialogClose">
+      <div>
+        <div>当前用户:{{user_info.username}}</div>
+        <div>当前角色:{{user_info.role_name}}</div>
+        <el-select v-model="active_role" placeholder="请选择">
+          <el-option
+            v-for="item in role_list"
+            :key="item.id"
+            :label="item.roleName"
+            :value="item.id">
+          </el-option>
+        </el-select>
+      </div>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="role_dialogVisible = false">取 消</el-button>
+        <el-button type="primary" @click="roleSubmit">更改</el-button>
       </span>
     </el-dialog>
   </div>
@@ -140,6 +161,7 @@ export default {
       total: 10, // 总的数据条数
       dialogVisible: false, // 控制添加用用户对话框的弹出
       edit_dialogVisible: false, // 控制编辑用户对话框的弹出
+      role_dialogVisible: false, // 控制角色编辑弹窗的弹出
       submit_form_rules: { // 提交表单验证规则
         username: [
           { required: true, message: '请输入用户昵称', trigger: 'blur' },
@@ -178,8 +200,12 @@ export default {
           { required: true, message: '请输入电话号码', trigger: 'blur' },
           { validator: checkNumber, trigger: 'blur' }
         ]
-      }
+      },
 
+      // 用户角色编辑模块使用到的信息
+      user_info: {},
+      role_list: [],
+      active_role: '' // 选中的角色值
     }
   },
   created () {
@@ -343,6 +369,57 @@ export default {
       // 请求成功
       this.$message.success('用户删除成功！')
       this.get_user_data()
+    },
+
+    // 修改角色按钮点击函数
+    roleDialogHandler: async function (userInfo) {
+      this.role_dialogVisible = true
+      this.user_info = userInfo
+      // 获取角色列表数据
+      const { data: res } = await this.$http.get('/roles')
+      if (res.meta.status !== 200) {
+        // 请求失败
+        return this.$message.error('数据异常')
+      }
+
+      // 请求数据成功
+      this.role_list = res.data
+      // console.log(this.role_list)
+    },
+
+    // 提交角色修改信息的函数
+    roleSubmit: async function () {
+      // 判断选择框的内容是否为空
+      if (!this.active_role) {
+        return this.$message.error('选择框内容不能为空！')
+      }
+
+      // 不是空的情况提交更改
+      const url = 'users/' + this.user_info.id + '/role'
+      const { data: res } = await this.$http.put(url, { rid: this.active_role })
+
+      if (res.meta.status !== 200) {
+        return this.$message.error('角色更改失败！')
+      }
+
+      this.$message.success('更改成功！')
+      // 更改成功关闭弹窗
+      this.role_dialogVisible = false
+      this.get_user_data()
+      // 清空角色模块相关数据防止出现bug
+      // this.user_info = {}
+      // this.role_list = []
+      // this.active_role = ''
+    },
+
+    // 关闭角色弹窗的处理函数
+    roleDialogClose: function () {
+      // 清空相关数据
+      this.user_info = {}
+      this.role_list = []
+      this.active_role = ''
+      // console.log('数据已经清空')
+      // this.$message.info('数据已清空')
     }
   }
 

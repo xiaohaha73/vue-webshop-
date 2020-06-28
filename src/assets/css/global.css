@@ -3,6 +3,7 @@ html, body, #app {
     height: 100%;
     margin: 0;
     padding: 0;
+    min-width:1366px;
 }
 .login_box .el-form-item__label {
     /*设置form表单中的字体颜色*/
@@ -20,4 +21,10 @@ html, body, #app {
 /*表格内容居中对齐*/
 .cell {
     text-align: center;
+}
+
+/*标签垂直居中*/
+.v_center {
+    display:flex;
+    align-items: center;
 }
