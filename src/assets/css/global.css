@@ -28,3 +28,11 @@ html, body, #app {
     display:flex;
     align-items: center;
 }
+
+.zk-table__cell-inner {
+    text-align: center;
+}
+
+.el-cascader-menu__list {
+    height: 300px;
+}
