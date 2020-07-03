@@ -24,9 +24,9 @@
         <el-tag type="danger" v-else>三级</el-tag>
       </template>
 
-      <template slot="setting">
-        <el-button type="warning" size="mini" icon="el-icon-edit">编辑</el-button>
-        <el-button type="danger" size="mini" icon="el-icon-delete">删除</el-button>
+      <template slot="setting" slot-scope="scope">
+        <el-button type="warning" size="mini" icon="el-icon-edit" @click="cateEdit(scope.row)">编辑</el-button>
+        <el-button type="danger" size="mini" icon="el-icon-delete" @click="cateDelete(scope.row.cat_id)">删除</el-button>
       </template>
     </tree-table>
 <!--    分页功能-->
@@ -65,6 +65,21 @@
     <span slot="footer" class="dialog-footer">
         <el-button @click="addVisable = false" >取 消</el-button>
         <el-button type="primary" @click="addSubmitHandler">确 定</el-button>
+      </span>
+  </el-dialog>
+
+<!--  编辑角色弹出窗口-->
+  <el-dialog
+    title="提示"
+    :visible.sync="editVisable"
+    width="40%" @close="editCloseHandler">
+    <span>编辑分类</span>
+    <div :model="editCateInfo" style="width: 80%">
+      分类名称：<el-input v-model="editCateInfo.cat_name"></el-input>
+    </div>
+    <span slot="footer" class="dialog-footer">
+        <el-button @click="editVisable = false" >取 消</el-button>
+        <el-button type="primary" @click="editSubmitHandler">确 定</el-button>
       </span>
   </el-dialog>
 </div>
@@ -112,6 +127,9 @@ export default {
       // 控制添加分类的弹出框
       addVisable: false,
 
+      // 控制编辑窗口的弹出
+      editVisable: false,
+
       // 获取的二级数据存放
       secondData: [],
 
@@ -137,6 +155,12 @@ export default {
         cat_name: [
           { required: true, message: '请输入分类名称', trigger: 'blur' }
         ]
+      },
+
+      // 编辑分类存放的数据
+      editCateInfo: {
+        cat_name: '',
+        cat_id: 0
       }
     }
   },
@@ -216,8 +240,8 @@ export default {
 
     // 提交添加弹窗的函数
     addSubmitHandler: async function () {
-    // console.log(this.addCate)
-    // 验证表单
+      // console.log(this.addCate)
+      // 验证表单
       this.$refs.addForm.validate(async (comfirm) => {
         if (!comfirm) {
           return this.$message('验证失败！')
@@ -233,7 +257,74 @@ export default {
         this.getData()
         this.addVisable = false
       })
+    },
+
+    // 角色删除函数
+    cateDelete: async function (id) {
+      // console.log(id)
+      // 弹出确认提示框
+      const result = await this.$confirm('此操作将永久删除此分类，是否继续操作？', '提示', {
+        confirmButtonText: '确认',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).catch(error => error)
+
+      if (result !== 'confirm') {
+        return this.$message.info('删除取消！')
+      }
+
+      // 确认删除
+      const { data: res } = await this.$http.delete('/categories/' + id)
+
+      if (res.meta.status !== 200) {
+        // 删除失败
+        return this.$message.error('删除失败!')
+      }
+
+      // 删除成功
+      this.$message.success('删除成功!')
+      this.getData()
+    },
+
+    // 编辑角色函数
+    cateEdit: function (node) {
+      // 弹出编辑窗口
+      this.editVisable = true
+      // console.log(node)
+      this.editCateInfo.cat_name = node.cat_name
+      this.editCateInfo.cat_id = node.cat_id
+    },
+
+    // 编辑弹窗关闭函数
+    editCloseHandler: function () {
+      // 清空数据
+      this.editCateInfo.cat_id = 0
+      this.editCateInfo.cat_name = ''
+    },
+
+    // 提交角色编辑函数
+    editSubmitHandler: async function () {
+      // console.log(this.editCateInfo)
+      if (!this.editCateInfo.cat_name) {
+        // cat_name不存在
+        return this.$message.error('名称不能为空！')
+      }
+
+      // 提交更改
+      const url = '/categories/' + this.editCateInfo.cat_id
+      const { data: res } = await this.$http.put(url, { cat_name: this.editCateInfo.cat_name })
+
+      if (res.meta.status !== 200) {
+        // 更新失败
+        return this.$message.error('数据更新失败!')
+      }
+
+      // 更新成功
+      this.$message.success('更新成功！')
+      this.getData()
+      this.editVisable = false
     }
+
   }
 }
 </script>
