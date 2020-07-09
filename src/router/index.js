@@ -7,6 +7,8 @@ import users from '../components/user/users.vue'
 import rights from '../components/rights/rights.vue'
 import roles from '../components/rights/roles.vue'
 import cate from '../components/goods/cate.vue'
+import params from '../components/goods/params.vue'
+
 Vue.use(VueRouter)
 
 const routes = [
@@ -21,7 +23,8 @@ const routes = [
       { path: '/users', component: users },
       { path: '/rights', component: rights },
       { path: '/roles', component: roles },
-      { path: '/categories', component: cate }
+      { path: '/categories', component: cate },
+      { path: '/params', component: params }
     ]
   } // home页面的路由
 ]
