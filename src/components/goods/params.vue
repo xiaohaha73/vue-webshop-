@@ -340,7 +340,6 @@ export default {
       }
 
       // 加载成功
-      // console.log(res.data)
       this.editDialogData = res.data
     },
 

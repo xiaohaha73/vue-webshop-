@@ -36,3 +36,17 @@ html, body, #app {
 .el-cascader-menu__list {
     height: 300px;
 }
+
+.el-checkbox {
+    margin-left: 0 !important;
+}
+
+/*富文本编辑框的样式*/
+.ql-container.ql-snow {
+    height: 200px;
+}
+
+/*提交商品按钮样式*/
+.submitGoods {
+    margin:100px 0 100px 300px;
+}
