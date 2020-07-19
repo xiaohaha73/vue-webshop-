@@ -11,6 +11,7 @@ import params from '../components/goods/params.vue'
 import list from '../components/goods/list.vue'
 import add from '.././components/goods/add.vue'
 import order from '../components/order/order.vue'
+import chart from '../components/chart/chart.vue'
 
 Vue.use(VueRouter)
 
@@ -30,7 +31,8 @@ const routes = [
       { path: '/params', component: params },
       { path: '/goods', component: list },
       { path: '/add', component: add },
-      { path: '/orders', component: order }
+      { path: '/orders', component: order },
+      { path: '/reports', component: chart}
     ]
   } // home页面的路由
 ]
