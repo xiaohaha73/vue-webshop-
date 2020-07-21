@@ -215,7 +215,6 @@ export default {
 
     // 级联改变函数
     cascaderHandleChange: function () {
-      console.log(this.cascaderValue)
       // 判断父级分类中是否有选中的内容
       if (this.cascaderValue.length === 0) {
         // 内容为空

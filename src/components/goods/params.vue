@@ -252,7 +252,6 @@ export default {
     // tab选中的函数
     tabHandleClick: async function () {
       this.getParams()
-      console.log(typeof this.activeTab)
     },
 
     // 定义一个切换tab请求数据的函数
